@@ -14,12 +14,17 @@ if (imgFolder is null)
   imgFolder = new DirectoryInfo("C:\\Users\\test\\source\\repos\\BulkCompressImage\\BulkCompressImage");
 }
 
-var inputDir = Path.Combine(imgFolder.FullName, "OriginalImg");
-var outputDir = Path.Combine(imgFolder.FullName, "CompressImg");
+var inputDir = Directory.CreateDirectory(Path.Combine(imgFolder.FullName, "OriginalImg"));
+var outputDir = Directory.CreateDirectory(Path.Combine(imgFolder.FullName, "CompressImg"));
 int compressionQuality = 70;
-var outputInfo = new DirectoryInfo(outputDir);
 
-foreach (var existFile in outputInfo.EnumerateFiles())
+if (Directory.GetFiles(inputDir.FullName, "*.*", SearchOption.AllDirectories).Length == 0)
+{
+  Console.WriteLine("Please Input Image to OriginalImg folder");
+  return;
+}
+
+foreach (var existFile in outputDir.EnumerateFiles())
 {
   existFile.Delete();
   Console.WriteLine($"Deleted {existFile}");
@@ -27,11 +32,11 @@ foreach (var existFile in outputInfo.EnumerateFiles())
 
 Console.WriteLine($"Deleted complete");
 
-foreach (var file in Directory.GetFiles(inputDir, "*.*", SearchOption.AllDirectories))
+foreach (var file in Directory.GetFiles(inputDir.FullName, "*.*", SearchOption.AllDirectories))
 {
   if (IsImageFile(file))
   {
-    var outputFile = Path.Combine(outputDir, Path.GetFileName(file));
+    var outputFile = Path.Combine(outputDir.FullName, Path.GetFileName(file));
     await CompressImageAsync(file, outputFile, compressionQuality);
     Console.WriteLine($"Compressed {file} to {outputFile}");
   }
